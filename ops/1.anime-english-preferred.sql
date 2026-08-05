@@ -49,7 +49,11 @@ INSERT INTO quality_profiles
 SELECT
     'Anime — English Preferred',
     '1080p Compact quality ladder with English-dub and dual-audio releases preferred; Japanese-only releases remain eligible.',
-    1, -10000, 30000, 1
+    -- Thresholds must match 1080p Compact's scoring magnitude: tier formats
+    -- score in the 900k range, so a cutoff near the dub bonus would be met by
+    -- every release and upgrades would never run. The 200000 floor still admits
+    -- Japanese-only releases, which are penalised by only 5000.
+    1, 200000, 10000000, 1
 FROM quality_profiles
 WHERE name = '1080p Compact';
 
