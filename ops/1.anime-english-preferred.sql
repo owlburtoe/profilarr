@@ -58,11 +58,22 @@ INSERT INTO quality_profiles
 SELECT
     'Anime — English Preferred',
     '1080p Compact quality ladder with English-dub and dual-audio releases preferred; Japanese-only releases remain eligible.',
-    -- Thresholds must match 1080p Compact's scoring magnitude: tier formats
-    -- score in the 900k range, so a cutoff near the dub bonus would be met by
-    -- every release and upgrades would never run. The 200000 floor still admits
-    -- Japanese-only releases, which are penalised by only 5000.
-    1, 200000, 10000000, 1
+    -- An English dub is mandatory here, and the gate is arithmetic rather than a
+    -- rule, so the numbers have to be sized against Dictionarry's scoring.
+    --
+    -- A release can match at most one ~924000 tier format (the QxR/TAoE group
+    -- formats negate the same group list the tier formats match, so they never
+    -- stack), plus streaming and audio bonuses of about 3000. That caps any
+    -- release WITHOUT a dub marker at roughly 927000.
+    --
+    -- minimum 940000  > that cap, so nothing undubbed can ever be grabbed.
+    -- dub bonus 960000 > the minimum on its own, so a dubbed release qualifies
+    --                   even when it matches no quality tier at all.
+    -- Keeping the bonus under 999999 preserves Dictionarry's bans: a dubbed but
+    -- banned release still lands below the minimum and is rejected.
+    -- cutoff 960000    stops upgrading as soon as a dub is in hand, since audio
+    --                   matters here and video tier does not.
+    1, 940000, 960000, 1
 FROM quality_profiles
 WHERE name = '1080p Compact';
 
@@ -104,9 +115,12 @@ WHERE quality_profile_name = '1080p Compact';
 INSERT INTO quality_profile_custom_formats
     (quality_profile_name, custom_format_name, arr_type, score)
 VALUES
-('Anime — English Preferred', 'English Dub / Dual Audio', 'radarr', 15000),
-('Anime — English Preferred', 'English Dub / Dual Audio', 'sonarr', 15000),
-('Anime — English Preferred', 'Dual Audio Groups', 'radarr', 10000),
-('Anime — English Preferred', 'Dual Audio Groups', 'sonarr', 10000),
+-- Both dub signals are worth a full qualifying score on their own. The curated
+-- groups ship dual audio as a matter of course, so a release from one clears the
+-- gate even when its title carries no explicit dual-audio tag.
+('Anime — English Preferred', 'English Dub / Dual Audio', 'radarr', 960000),
+('Anime — English Preferred', 'English Dub / Dual Audio', 'sonarr', 960000),
+('Anime — English Preferred', 'Dual Audio Groups', 'radarr', 960000),
+('Anime — English Preferred', 'Dual Audio Groups', 'sonarr', 960000),
 ('Anime — English Preferred', 'JP Audio Only', 'radarr', -5000),
 ('Anime — English Preferred', 'JP Audio Only', 'sonarr', -5000);
