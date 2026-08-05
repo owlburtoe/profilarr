@@ -3,8 +3,12 @@
 -- upstream snapshot so scheduled refreshes preserve the local profile.
 
 INSERT INTO regular_expressions (name, pattern, regex101_id, description) VALUES
-('Anime Dual Audio - English Dub', '\b(dual[ ._-]?audio|multi[ ._-]?audio|eng(lish)?[ ._-]?dub(bed)?)\b|\[(en|eng)\+(ja|jpn)\]|\b(eng?|en)\+(jpn?|ja)\b', NULL, NULL),
-('Anime Dual Audio Groups', '(?<=^|[\s.-])(EMBER|Judas|ZR|VARYG|Cerberus|ToonsHub|SCY|Arid)\b', NULL, NULL),
+-- The bare-DUAL branch requires a leading delimiter and a trailing hyphen so it
+-- matches the ".DUAL-GROUP" tag form without catching titles that merely open
+-- with the word Dual. Keeping it hyphen-anchored leaves the Latino pattern's
+-- broader bare "dual" untouched.
+('Anime Dual Audio - English Dub', '\b(dual[ ._-]?audio|multi[ ._-]?audio|eng(lish)?[ ._-]?dub(bed)?)\b|(?<=[ ._-])dual(?=-)|\[(en|eng)\+(ja|jpn)\]|\b(eng?|en)\+(jpn?|ja)\b', NULL, NULL),
+('Anime Dual Audio Groups', '(?<=^|[\s.-])(EMBER|Judas|ZR|VARYG|Cerberus|ToonsHub|SCY|Arid|Kametsu|Reaktor|Golumpa|Yameii|Vodes|Chotab|Koten_Gars|Baws|ZeroBuild|Anime[ ._-]?Time)\b', NULL, NULL),
 ('Anime JP-Only Groups', '(?<=^|[\s.-])(SubsPlease|Erai-raws|HorribleSubs|Ohys-Raws|Beatrice-Raws|Moozzi2)\b', NULL, NULL),
 ('Anime Raw-Subbed Japanese Audio', '\b(raw|subbed|jpn?[ ._-]?audio)\b', NULL, NULL);
 
@@ -41,7 +45,12 @@ VALUES
 ('Dual Audio Groups', 'Example.Anime.S01E01.1080p.WEB-DL.DDP5.1.H.264-SCYTHE', 'series', 0, 'A longer release-group name must not match SCY'),
 ('Dual Audio Groups', 'Example.Anime.S01E01.1080p.WEB-DL.DDP5.1.H.264-ZRX', 'series', 0, 'A longer release-group name must not match ZR'),
 ('JP Audio Only', 'Example.Anime.S01E01.1080p.WEB-DL.JPN-Audio.H.264-SubsPlease', 'series', 1, 'Japanese-audio marker and Japanese-only release group'),
-('JP Audio Only', 'Example.Anime.S01E01.1080p.WEB-DL.Dual-Audio.H.264-VARYG', 'series', 0, 'Dual-audio release from a preferred group');
+('JP Audio Only', 'Example.Anime.S01E01.1080p.WEB-DL.Dual-Audio.H.264-VARYG', 'series', 0, 'Dual-audio release from a preferred group'),
+('English Dub / Dual Audio', 'Demon.Slayer.Kimetsu.no.Yaiba.S05E08.The.Hashira.Unite.1080p.CR.WEB-DL.AAC2.0.H.264.DUAL-VARYG', 'series', 1, 'Real Sonarr grab: bare DUAL tag ahead of the release group'),
+('English Dub / Dual Audio', 'Dual-Survival.S01E01.1080p.WEB-DL.DDP5.1.H.264-FROGE', 'series', 0, 'A hyphenated title word at the start must not match the bare DUAL branch'),
+('Dual Audio Groups', 'Example.Anime.S01E01.1080p.BluRay.FLAC.x264-Kametsu', 'series', 1, 'Newly added dual-audio group'),
+('Dual Audio Groups', 'Example.Anime.S01E01.1080p.WEB-DL.AAC2.0.H.264-Yameii', 'series', 1, 'Newly added dual-audio web group'),
+('Dual Audio Groups', 'Anime.Timeline.S01E01.1080p.WEB-DL.H.264-FROGE', 'series', 0, 'A title beginning with Anime Time must not match the group token');
 
 INSERT INTO quality_profiles
     (name, description, upgrades_allowed, minimum_custom_format_score,
