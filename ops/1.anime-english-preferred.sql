@@ -47,7 +47,9 @@ INSERT INTO quality_profiles
     (name, description, upgrades_allowed, minimum_custom_format_score,
      upgrade_until_score, upgrade_score_increment)
 SELECT
-    'Anime — English Preferred', description, 1, -10000, 30000, 1
+    'Anime — English Preferred',
+    '1080p Compact quality ladder with English-dub and dual-audio releases preferred; Japanese-only releases remain eligible.',
+    1, -10000, 30000, 1
 FROM quality_profiles
 WHERE name = '1080p Compact';
 
